@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dc72825be07c4000a3d7f2d8c796340, type: 3}
+  m_Name: 1
+  m_EditorClassIdentifier: 
+  levelName: Intro
+  objectiveDescription: Survive the level and beat the final boss to progress to
+    the next level
+  spawnRadius: 100
+  initialObjectCount: 10
+  initialSpawnInterval: 5
+  maxSpawnCount: 1000
+  basicEnemyPrefabs:
+  - {fileID: 6396869630834215807, guid: 11790cc3656db451cbcf4b129a7eb42d, type: 3}
+  - {fileID: 8190572075207857125, guid: 3196b37801ac84e19a1af49e6c406866, type: 3}
+  advancedEnemyPrefabs:
+  - {fileID: 6396869630834215807, guid: 3aedf698fc0df4cd1960419049de63b6, type: 3}
+  - {fileID: 8190572075207857125, guid: 4623e3cf54fe54d03b23ea1f3b5ff0d7, type: 3}
+  bossPrefab: {fileID: 6396869630834215807, guid: 2a1add736ef1e4c448ab6569eef39e2c, type: 3}

@@ -1,0 +1,117 @@
+[
+    {
+        "name": "FrostAura",
+        "description": "A chilling aura that damages enemies over time",
+        "cooldown": 0.0,
+        "isActive": true,
+        "abilityTypes": ["IAOE", "IDOT"],
+        "attributes": {
+            "AreaRadius": 3.0,
+            "DamagePerTick": 10,
+            "TickInterval": 1.0,
+            "Duration": 5.0
+        }
+    },
+    {
+        "name": "Fireball",
+        "description": "A fiery projectile that burns enemies over time",
+        "cooldown": 4.0,
+        "isActive": true,
+        "abilityTypes": ["IProjectile", "IDOT"],
+        "attributes": {
+            "ProjectileSpeed": 15.0,
+            "EffectAmount": 20,
+            "DamagePerTick": 10,
+            "TickInterval": 0.5,
+            "Duration": 4.0
+        }
+    },
+    {
+        "name": "LightningBolt",
+        "description": "A lightning projectile that chains to nearby enemies",
+        "cooldown": 3.5,
+        "isActive": true,
+        "abilityTypes": ["IProjectile", "IChainTarget"],
+        "attributes": {
+            "ProjectileSpeed": 15.0,
+            "EffectAmount": 30,
+            "MaxChains": 1,
+            "ChainRange": 25.0
+        }
+    },
+    {
+        "name": "LightningStrike",
+        "description": "Instantly strikes a single enemy with lightning",
+        "cooldown": 3.0,
+        "isActive": true,
+        "abilityTypes": ["ISingleTarget"],
+        "attributes": {
+            "EffectAmount": 25
+        }
+    },
+    {
+        "name": "PoisonCloud",
+        "description": "A cloud of poisonous gas infecting enemies who enter",
+        "cooldown": 5.0,
+        "isActive": true,
+        "abilityTypes": ["IAOE", "IDOT"],
+        "attributes": {
+            "AreaRadius": 4,
+            "DamagePerTick": 5,
+            "TickInterval": 0.5,
+            "Duration": 5.0
+        }
+    },
+    {
+        "name": "ProjectileCount",
+        "description": "Increases all projectile instantiation count by 1",
+        "cooldown": 0,
+        "isActive": false,
+        "abilityTypes": ["Passive"],
+        "attributes": {
+            "projectileCount": 1
+        }
+    },
+    {
+        "name": "DamageBonus",
+        "description": "Increases global damage by 10%",
+        "cooldown": 0,
+        "isActive": false,
+        "abilityTypes": ["Passive"],
+        "attributes": {
+            "DamageMultiplier": 0.1
+        }
+    },
+    {
+        "name": "CooldownReduction",
+        "description": "Reduces ability cooldown times by 5%",
+        "cooldown": 0,
+        "isActive": false,
+        "abilityTypes": ["Passive"],
+        "attributes": {
+            "ReductionMultiplier": 0.05
+        }
+    },
+    {
+        "name": "MovementSpeed",
+        "description": "Increases movement speed by 15%",
+        "cooldown": 0,
+        "isActive": false,
+        "abilityTypes": ["Passive"],
+        "attributes": {
+            "SpeedMultiplier": 1
+        }
+    },
+    {
+        "name": "HealthRegen",
+        "description": "Applies a passive HOT to the player",
+        "cooldown": 0,
+        "isActive": false,
+        "abilityTypes": ["Passive", "ISelfTarget", "IHOT"],
+        "attributes": {
+            "HealPerTick": 5,
+            "TickInterval": 1,
+            "Duration": 0
+        }
+    }
+]
