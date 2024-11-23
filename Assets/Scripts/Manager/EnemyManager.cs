@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.TestTools.CodeCoverage;
 using UnityEngine;
 using UnityEngine.UI; // Required for Image
 
@@ -8,7 +7,7 @@ public class EnemyManager : MonoBehaviour
 {
     [Header("Player Settings")]
     public string playerTag = "Player";
-    private Transform player;
+    private Transform playerTransform;
 
     [Header("Enemy Pools")]
     public List<ObjectPool> basicEnemyPools; // Pools for basic enemies
@@ -55,15 +54,14 @@ public class EnemyManager : MonoBehaviour
         this.waveInterval = waveInterval;
         this.maxSpawnCount = maxSpawnCount;
 
-        Initialize();
+        EventManager<GameObject>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, Initialize);
     }
 
-    private void Initialize()
+    private void Initialize(GameObject player)
     {
-        GameObject playerObject = GameObject.FindWithTag(playerTag);
-        if (playerObject != null)
+        if (player != null)
         {
-            player = playerObject.transform;
+            playerTransform = player.transform;
         }
         else
         {
@@ -71,11 +69,11 @@ public class EnemyManager : MonoBehaviour
             return;
         }
         dataManager = FindObjectOfType<DataPersistenceManager>();
-
+        EventManager<object>.RegisterEvent(EventKey.RESTART, _ => Restart());
         StartSpawning();
     }
 
-    private void StartSpawning()
+    public void StartSpawning()
     {
         if (spawnCoroutine == null)
         {
@@ -130,7 +128,7 @@ public class EnemyManager : MonoBehaviour
             float radians = angle * Mathf.Deg2Rad;
 
             // Calculate spawn position on the circle
-            Vector3 spawnPosition = player.position + new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)) * spawnRadius;
+            Vector3 spawnPosition = playerTransform.position + new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)) * spawnRadius;
 
             // Get an enemy from the selected pool
             ObjectPool selectedPool = pools[Random.Range(0, pools.Count)];
@@ -139,7 +137,7 @@ public class EnemyManager : MonoBehaviour
             if (enemy != null)
             {
                 enemy.transform.position = spawnPosition;
-                enemy.transform.rotation = Quaternion.LookRotation(player.position - spawnPosition); // Face the player
+                enemy.transform.rotation = Quaternion.LookRotation(playerTransform.position - spawnPosition); // Face the player
 
                 currentEnemyCount++;
                 UpdateProgressMeter();
@@ -170,7 +168,7 @@ public class EnemyManager : MonoBehaviour
         bossSpawned = true;
 
         GameObject boss = bossPool.GetObject();
-        Vector3 spawnPosition = player.position + new Vector3(0, 0, spawnRadius);
+        Vector3 spawnPosition = playerTransform.position + new Vector3(0, 0, spawnRadius);
         boss.transform.position = spawnPosition;
         boss.transform.rotation = Quaternion.identity;
 
@@ -193,23 +191,66 @@ public class EnemyManager : MonoBehaviour
             };
         }
     }
+    private void ResetAllEnemies(List<ObjectPool> pools)
+    {
+        foreach (var pool in pools)
+        {
+            pool.ReturnAllObjects(); // Ensure ObjectPool has a method to return all active objects
+        }
+    }
+    
+
 
     public void Restart()
     {
+        // Stop current spawning
         if (spawnCoroutine != null)
         {
             StopCoroutine(spawnCoroutine);
             spawnCoroutine = null;
         }
 
+        // Reset spawn counters
         currentEnemyCount = 0;
         bossSpawned = false;
 
+        // Reset the progress meter
         if (progressMeter != null)
         {
-            progressMeter.fillAmount = 0f; // Reset progress meter
+            progressMeter.fillAmount = 0f;
         }
 
+        // Return all active enemies to their pools
+        ResetAllEnemies(basicEnemyPools);
+        ResetAllEnemies(advancedEnemyPools);
+        if (bossPool != null)
+        {
+            ResetAllEnemies(new List<ObjectPool> { bossPool });
+        }
+
+        // Re-initialize dependencies if necessary
+        GameObject playerObject = GameObject.FindWithTag(playerTag);
+        if (playerObject != null)
+        {
+            playerTransform = playerObject.transform;
+        }
+        Debug.Log("Cleaning up all enemies on restart...");
+        
+        // Find all enemies in the scene by tag
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        // Destroy each enemy
+        foreach (GameObject enemy in enemies)
+        {
+            Destroy(enemy);
+        }
+        // Restart spawning
         StartSpawning();
+    }
+    void OnApplicationQuit() {
+        EventManager<object>.UnregisterEvent(EventKey.RESTART, _ => Restart());
+        EventManager<GameObject>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, Initialize);
+
+
     }
 }

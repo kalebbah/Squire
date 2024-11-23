@@ -6,6 +6,10 @@ public class WASDMove : Move
     {
         CheckAndMove();  // Only move if not paused
     }
+    protected override void Start()
+    {
+        base.Start();
+    }
 
     public override void PerformMove()
     {

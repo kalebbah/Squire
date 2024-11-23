@@ -4387,7 +4387,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 940648458}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1502093724}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: GoHome
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &940648458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4508,7 +4520,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 961024348}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1584501760}
+        m_TargetAssemblyTypeName: Lottery, Assembly-CSharp
+        m_MethodName: OnOkayButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
 --- !u!114 &961024348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5928,6 +5952,10 @@ PrefabInstance:
     - target: {fileID: 1932315867944890908, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1932315867944890908, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3726783772366381200, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7377,7 +7405,8 @@ MonoBehaviour:
   pauseCanvas: {fileID: 1294421737}
   levelUpCanvas: {fileID: 1652657393}
   endCanvas: {fileID: 689504517}
-  player: {fileID: 1947097447}
+  playerPrefab: {fileID: 1932315867944890908, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
+  initialPlayerPosition: {x: 0, y: 0, z: 0}
   pauseAbilityText: {fileID: 0}
 --- !u!4 &1502093725
 Transform:
@@ -9942,11 +9971,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!1 &1947097447 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1932315867944890908, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
-  m_PrefabInstance: {fileID: 1232124016}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1947097448 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3726783772366381200, guid: 95d7b144436bd47ed8d4d7796abc693c, type: 3}
@@ -11209,5 +11233,5 @@ SceneRoots:
   - {fileID: 1294421738}
   - {fileID: 1767737994}
   - {fileID: 1652657394}
-  - {fileID: 132409167}
   - {fileID: 689504518}
+  - {fileID: 132409167}

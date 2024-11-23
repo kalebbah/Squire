@@ -46,6 +46,7 @@ public class PlayerHandle : MonoBehaviour
 
         if (healthHandle.TakeDamage(damageAmount, gameObject))
         {
+            
             EventManager<EventArgs>.TriggerEvent(EventKey.SAVE_DATA, EventArgs.Empty);
             EventManager<object>.TriggerEvent(EventKey.SHOW_END_SCREEN, null);
             Destroy(gameObject);

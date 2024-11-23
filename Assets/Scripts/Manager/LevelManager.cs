@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor.TestTools.CodeCoverage;
 
 public class LevelManager : MonoBehaviour
 {
@@ -8,7 +7,7 @@ public class LevelManager : MonoBehaviour
     public List<LevelData> levels;
     private EnemyManager enemyManager;
 
-    private void Start()
+    private void Awake()
     {
         enemyManager = FindObjectOfType<EnemyManager>();
         int lvl = FindObjectOfType<DataPersistenceManager>().Level;
@@ -23,7 +22,6 @@ public class LevelManager : MonoBehaviour
             Debug.LogError("Invalid level index.");
             return;
         }
-        Debug.Log(index-1);
         LevelData currentLevel = levels[index];
 
         List<ObjectPool> basicPools = CreatePools(currentLevel.basicEnemyPrefabs);

@@ -63,7 +63,7 @@ public class DataPersistenceManager : MonoBehaviour
         PlayerPrefs.SetInt(LuckLevelKey, (int)StatManager.Instance.LuckBoost);
 
         PlayerPrefs.Save();
-        Debug.Log("Game data saved.");
+        //Debug.Log("Game data saved.");
     }
 
     private void OnLoadData(EventArgs args)

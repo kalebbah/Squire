@@ -26,8 +26,9 @@ public class GameManager : MonoBehaviour
     public Canvas endCanvas;
 
     [Header("Player Settings")]
-    public GameObject player;
-    private Vector3 initPosition;
+    public GameObject playerPrefab;  // Assign the player prefab in the Inspector
+    private GameObject playerInstance; // Reference to the instantiated player
+    public Vector3 initialPlayerPosition = Vector3.zero; // Default spawn position
 
     [Header("Pause Menu Settings")]
     public TextMeshProUGUI pauseAbilityText;
@@ -51,25 +52,55 @@ public class GameManager : MonoBehaviour
     {
         ChangeState(GameState.HOME); // Start in the Home state
         RegisterEvents();
-        EventManager<PlayerHandle>.TriggerEvent(EventKey.UPDATE_PLAYER_CURRENCY_DISPLAY, player.GetComponent<PlayerHandle>());
-
+         // Instantiate the player at the start
+        InstantiatePlayer();
     }
 
     private void Update()
     {
         HandleInput();
     }
+    public GameObject GetPlayerInstance()
+{
+    return playerInstance;
+}
+
+
+    private void InstantiatePlayer()
+    {
+        if (playerPrefab == null)
+        {
+            Debug.LogError("Player prefab is not assigned in GameManager!");
+            return;
+        }
+
+        // Destroy the previous player instance if it exists
+        if (playerInstance != null)
+        {
+            Destroy(playerInstance);
+        }
+
+        // Instantiate the player at the initial position
+        playerInstance = Instantiate(playerPrefab, initialPlayerPosition, Quaternion.identity);
+        Debug.Log("Player instantiated at position: " + initialPlayerPosition);
+        EventManager<GameObject>.TriggerEvent(EventKey.PLAYER_INSTANTIATE, playerInstance);
+    }
 
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(currentState == GameState.HOME)
+            if (currentState == GameState.HOME)
+            {
                 ChangeState(GameState.GAME);
+                EventManager<object>.TriggerEvent(EventKey.RESTART, null);
+            }
             else if (currentState == GameState.GAME)
                 ChangeState(GameState.PAUSE);
             else if (currentState == GameState.PAUSE)
                 ChangeState(GameState.GAME);
+        } else if (Input.GetKeyDown(KeyCode.K)) {
+            PlayerManager.Instance.Kill();
         }
     }
 
@@ -80,6 +111,7 @@ public class GameManager : MonoBehaviour
 
     private void RegisterEvents()
     {
+        EventManager<object>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, null);
         EventManager<object>.RegisterEvent(EventKey.SHOW_GAME_UI, ShowGameUI);
         EventManager<object>.RegisterEvent(EventKey.HIDE_GAME_UI, HideGameUI);
         EventManager<object>.RegisterEvent(EventKey.SHOW_LEVELUP_UI, ShowLevelUpUI);
@@ -92,11 +124,13 @@ public class GameManager : MonoBehaviour
         EventManager<object>.RegisterEvent(EventKey.HIDE_END_SCREEN, HideEndGameScreen);
         EventManager<object>.RegisterEvent(EventKey.SHOW_SETTINGS_MENU, ShowSettingsMenu);
         EventManager<object>.RegisterEvent(EventKey.HIDE_SETTINGS_MENU, HideSettingsMenu);
+
         Debug.Log("UI events registered.");
     }
 
     private void UnregisterEvents()
     {
+        EventManager<object>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, null);
         EventManager<object>.UnregisterEvent(EventKey.SHOW_GAME_UI, ShowGameUI);
         EventManager<object>.UnregisterEvent(EventKey.HIDE_GAME_UI, HideGameUI);
         EventManager<object>.UnregisterEvent(EventKey.SHOW_LEVELUP_UI, ShowLevelUpUI);
@@ -117,8 +151,13 @@ public class GameManager : MonoBehaviour
         currentState = newState;
         EventManager<GameState>.TriggerEvent(EventKey.GAME_STATE_CHANGED, newState);
         UpdateUI();
-    }
 
+        // Reset the player when returning to HOME
+        if (newState == GameState.HOME)
+        {
+            InstantiatePlayer();
+        }
+    }
 
     private void UpdateUI()
     {
@@ -140,17 +179,15 @@ public class GameManager : MonoBehaviour
     private void HideGameUI(object obj) => gameCanvas.gameObject.SetActive(false);
 
     private void ShowLevelUpUI(object obj) => ChangeState(GameState.LEVELUP);
-    private void HideLevelUpUI(object obj) {
+    private void HideLevelUpUI(object obj)
+    {
         levelUpCanvas.gameObject.SetActive(false);
         ChangeState(GameState.GAME);
     }
+
     private void ShowPauseMenu(object obj)
     {
         ChangeState(GameState.PAUSE);
-        // if (pauseAbilityText)
-        // {
-        //     pauseAbilityText.text = PlayerManager.Instance?.User?.GetAbilityHandle()?.ListAbilities() ?? "";
-        // }
     }
 
     private void HidePauseMenu(object obj) => ChangeState(GameState.GAME);
@@ -162,4 +199,8 @@ public class GameManager : MonoBehaviour
     private void HideSettingsMenu(object obj) => settingsCanvas.gameObject.SetActive(false);
 
     public void Quit() => Application.Quit();
+    public void GoHome() {
+        ChangeState(GameState.HOME);
+        EventManager<object>.TriggerEvent(EventKey.RESTART, null);
+    }
 }

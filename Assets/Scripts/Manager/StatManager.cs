@@ -17,7 +17,7 @@ public class StatManager : MonoBehaviour
     public float CooldownReduction { get; set; } // Cooldown reduction percentage (e.g., -10%)
     public int MovementSpeed { get; set; }// Base multiplier for movement speed
     public float HealthRegen { get; set; }   // Health regeneration per second
-    public int ProjectileCount { get; set; }  = 1; // Number of additional projectiles
+    public int ProjectileCount { get; set; }  = 2; // Number of additional projectiles
 
     private void Awake()
     {
@@ -30,8 +30,12 @@ public class StatManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        MovementSpeed = FindObjectOfType<WASDMove>().speed;
+        EventManager<GameObject>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, PlayerDependency);
         ProjectileCount = 1;
+    }
+
+    private void PlayerDependency(GameObject player) {
+        MovementSpeed = player.GetComponent<WASDMove>().speed;
     }
     private void Update()
     {

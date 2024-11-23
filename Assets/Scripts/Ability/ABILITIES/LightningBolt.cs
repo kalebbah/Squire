@@ -154,12 +154,12 @@ public class LightningBoltCollision : MonoBehaviour
     private int remainingChains;
 
     public void Initialize(LightningBolt lightning, float effectAmount, int maxChains)
-    {
-        lightningAbility = lightning;
-        this.effectAmount = effectAmount;
-        this.remainingChains = maxChains;
-        Debug.Log($"LightningBoltCollision initialized with effectAmount: {effectAmount}, maxChains: {maxChains}");
-    }
+{
+    lightningAbility = lightning;
+    this.effectAmount = effectAmount;
+    this.remainingChains = maxChains;
+    Debug.Log($"LightningBoltCollision initialized with effectAmount: {effectAmount}, maxChains: {maxChains}");
+}
 
 
     private void OnCollisionEnter(Collision collision)

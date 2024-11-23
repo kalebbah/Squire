@@ -26,16 +26,12 @@ public class AbilityManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        EventManager<GameObject>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, Initialize);
+        EventManager<object>.RegisterEvent(EventKey.RESTART, _ => ResetManager()); // Listen for the RESTART event
     }
 
     private void Start()
     {
-        playerAbilityHandle = FindObjectOfType<AbilityHandle>();
-        if (playerAbilityHandle == null)
-        {
-            Debug.LogError("No AbilityHandle found on player.");
-        }
-
         abilityUIImages = FindObjectOfType<AbilityUIImages>();
         if (abilityUIImages == null)
         {
@@ -44,13 +40,30 @@ public class AbilityManager : MonoBehaviour
 
         EventManager<GameState>.RegisterEvent(EventKey.GAME_STATE_CHANGED, OnGameStateChanged);
 
-        // Start active ability cooldowns at initialization
-        ResumeActiveAbilities();
+        if (GameManager.Instance.currentState == GameState.GAME)
+        {
+            ResumeActiveAbilities();
+        }
+    }
+
+    private void Initialize(GameObject player)
+    {
+        playerAbilityHandle = player.GetComponent<PlayerHandle>().GetAbilityHandle();
+        if (playerAbilityHandle == null)
+        {
+            Debug.LogError("No AbilityHandle found on player.");
+        }
     }
 
     private void OnDestroy()
     {
         EventManager<GameState>.UnregisterEvent(EventKey.GAME_STATE_CHANGED, OnGameStateChanged);
+        EventManager<object>.UnregisterEvent(EventKey.RESTART, _ => ResetManager()); // Unregister RESTART event
+    }
+
+    private void OnApplicationQuit()
+    {
+        EventManager<GameObject>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, Initialize);
     }
 
     private void OnGameStateChanged(GameState newState)
@@ -69,7 +82,6 @@ public class AbilityManager : MonoBehaviour
             ResumeActiveAbilities();
         }
     }
-
 
     public bool AddAbility(BaseAbility ability)
     {
@@ -116,9 +128,7 @@ public class AbilityManager : MonoBehaviour
         switch (ability)
         {
             case ProjectileCount pc:
-                Debug.Log(StatManager.Instance.ProjectileCount);
                 StatManager.Instance.AddProjectileCount(pc.Count);
-                Debug.Log(StatManager.Instance.ProjectileCount);
                 break;
             case CooldownReduction cr:
                 StatManager.Instance.AddCooldownReduction(cr.ReductionMultiplier);
@@ -193,19 +203,17 @@ public class AbilityManager : MonoBehaviour
         }
     }
 
-
     private void ResumeActiveAbilities()
     {
         foreach (var ability in playerAbilityHandle.GetActiveAbilities())
         {
-            if (!ability.IsCoroutineActive) // Only restart if the coroutine is inactive
+            if (!ability.IsCoroutineActive)
             {
                 Debug.Log($"Resuming ability: {ability.Name}");
                 StartAbilityCoroutine(AbilityCooldownCoroutine(ability));
             }
         }
     }
-
 
     public void StartAbilityCoroutine(IEnumerator coroutine)
     {
@@ -223,6 +231,28 @@ public class AbilityManager : MonoBehaviour
         }
     }
 
+    private void ResetManager()
+    {
+        Debug.Log("Resetting AbilityManager...");
+
+        // Stop all active coroutines
+        foreach (var coroutine in activeCoroutines.Values)
+        {
+            StopCoroutine(coroutine);
+        }
+        activeCoroutines.Clear();
+
+        // Remove all abilities
+        if (playerAbilityHandle != null)
+        {
+            foreach (var ability in playerAbilityHandle.GetStoredAbilities())
+            {
+                RemoveAbility(ability);
+            }
+        }
+
+        Debug.Log("AbilityManager reset complete.");
+    }
 
     public GameObject InstantiateAbilityObject(string prefabName, Vector3 position, Quaternion rotation)
     {

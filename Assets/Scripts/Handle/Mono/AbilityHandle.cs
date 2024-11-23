@@ -36,6 +36,19 @@ public class AbilityHandle : MonoBehaviour
             Debug.Log($"Added ability: {ability.Name}");
         }
     }
+    public BaseAbility GetAbility(BaseAbility ability)
+    {
+        if (ability == null) return null;
+        return storedAbilities.FirstOrDefault(a => a.Name == ability.Name);
+    }
+
+    // Overload to get ability by name
+    public BaseAbility GetAbility(string abilityName)
+    {
+        if (string.IsNullOrEmpty(abilityName)) return null;
+        return storedAbilities.FirstOrDefault(a => a.Name == abilityName);
+    }
+
 
     public void RemoveAbility(BaseAbility ability)
     {

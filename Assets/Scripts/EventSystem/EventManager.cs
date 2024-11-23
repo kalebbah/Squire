@@ -63,6 +63,8 @@ public static class EventKey {
     public const string UPDATE_SLIDER_EXPERIENCE_DISPLAY = "UpdateSliderExperienceDisplay";
     public const string SAVE_DATA = "SaveData";
     public const string LOAD_DATA = "LoadData";
+    public const string RESTART = "Restart";
+    public const string PLAYER_INSTANTIATE = "PlayerInstantiate";
 
     // Player Specific Events
     public const string UPDATE_PLAYER_HEALTH = "UpdatePlayerHealth";    

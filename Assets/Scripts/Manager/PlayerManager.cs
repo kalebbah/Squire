@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -20,39 +19,48 @@ public class PlayerManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        
 
+        RegisterEvents();
+    }
+    void FindPlayer(GameObject player) {
         // Find and assign the PlayerHandle
-        User = FindObjectOfType<PlayerHandle>();
+        User = player.GetComponent<PlayerHandle>();
         if (User == null)
         {
             Debug.LogError("PlayerHandle not found in the scene!");
             return;
         }
-
-        RegisterEvents();
+        Display();
     }
 
     private void Start()
     {
-        Display();
+        //Display();
     }
 
     private void Update()
     {
-        if (User.GetHealthHandle().CurrentHealth > 0)
-        {
-            User.GetComponent<WASDMove>().enabled = GameManager.Instance.currentState == GameState.GAME;
+        if(User) {
+           if (User.GetHealthHandle().CurrentHealth > 0)
+            {
+                User.GetComponent<WASDMove>().enabled = GameManager.Instance.currentState == GameState.GAME;
+            } 
         }
+        
     }
 
     // Registering all required events
     private void RegisterEvents()
     {
+        EventManager<GameObject>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, FindPlayer);
         EventManager<int>.RegisterEvent(EventKey.UPDATE_PLAYER_COINS, AddUserCoinCounter);
         EventManager<int>.RegisterEvent(EventKey.UPDATE_PLAYER_GEMS, AddUserGemCounter);
         EventManager<int>.RegisterEvent(EventKey.UPDATE_PLAYER_EXPERIENCE, AddUserExperience);
         EventManager<int>.RegisterEvent(EventKey.UPDATE_PLAYER_HEALTH, AddUserHealth);
         EventManager<int>.RegisterEvent(EventKey.UPDATE_PLAYER_LEVEL,AddUserLevel);
+        EventManager<object>.RegisterEvent(EventKey.RESTART, _ => Restart());
+
     }
 
     // Display UI for player stats
@@ -62,6 +70,18 @@ public class PlayerManager : MonoBehaviour
         EventManager<HealthHandle>.TriggerEvent(EventKey.UPDATE_SLIDER_HEALTH_DISPLAY, User.GetHealthHandle());
         EventManager<PlayerHandle>.TriggerEvent(EventKey.UPDATE_PLAYER_CURRENCY_DISPLAY, User);
     }
+
+    private void Restart()
+    {
+        Debug.Log("Restarting PlayerManager...");
+        User.Restart();
+        // User.GetHealthHandle().ResetHealth();
+        // User.GetExperienceHandle().ResetExperienceHandle();
+        User.GetCurrencyHandle().ResetCurrency();
+        // User.GetAbilityHandle().ResetAbilityHandle();
+        Display();
+    }
+
 
     // Event-based handlers
     private void AddUserCoinCounter(int toCoin)
@@ -123,8 +143,16 @@ public class PlayerManager : MonoBehaviour
         EventManager<HealthHandle>.TriggerEvent(EventKey.UPDATE_SLIDER_HEALTH_DISPLAY, User.GetHealthHandle());
     }
 
+    public void Kill(){
+        User.GetHealthHandle().TakeDamage(10000, User.gameObject);
+    }
+
     private void OnDestroy()
     {
+        UnregisterEvents();
+    }
+
+    private void OnApplicationQuit() {
         UnregisterEvents();
     }
 
@@ -134,6 +162,10 @@ public class PlayerManager : MonoBehaviour
         EventManager<int>.UnregisterEvent(EventKey.UPDATE_PLAYER_HEALTH, AddUserHealth);
         EventManager<int>.UnregisterEvent(EventKey.UPDATE_PLAYER_COINS, AddUserCoinCounter);
         EventManager<int>.UnregisterEvent(EventKey.UPDATE_PLAYER_GEMS, AddUserGemCounter);
-        EventManager<int>.UnregisterEvent(EventKey.UPDATE_PLAYER_LEVEL,AddUserLevel);
+        EventManager<int>.UnregisterEvent(EventKey.UPDATE_PLAYER_LEVEL, AddUserLevel);
+        EventManager<object>.UnregisterEvent(EventKey.RESTART, _ => Restart());
+        EventManager<GameObject>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, FindPlayer);
+
+
     }
 }

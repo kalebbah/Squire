@@ -10,22 +10,37 @@ public class PlayerHealthSlider : GenericSlider<HealthHandle> {
     private Coroutine hideHealthBarRoutine;
     private Camera mainCamera;
 
-    void Start() {
+    void Start()
+    {
         mainCamera = Camera.main;
         healthBarGameObject.SetActive(false); // Initially hide the health bar container
+
+        // Check if player already exists and assign it
+        GameObject existingPlayer = GameManager.Instance?.GetPlayerInstance();
+        if (existingPlayer != null)
+        {
+            PlayerDependency(existingPlayer);
+        }
+    }
+
+
+    private void PlayerDependency(GameObject player) {
+        playerTransform = player.transform;
     }
 
     void Update() {
-        if (PlayerManager.Instance.User.GetHealthHandle().CurrentHealth > 0) {
+        if (PlayerManager.Instance?.User.GetHealthHandle().CurrentHealth > 0) {
             UpdatePosition(); // Position the health bar above the player in screen space
         }
     }
 
     protected override void RegisterEvents() {
         EventManager<HealthHandle>.RegisterEvent(EventKey.UPDATE_SLIDER_HEALTH_DISPLAY, UpdateSlider);
+        EventManager<GameObject>.RegisterEvent(EventKey.PLAYER_INSTANTIATE, PlayerDependency);
     }
 
     protected override void UnregisterEvents() {
+        EventManager<GameObject>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, PlayerDependency);
         EventManager<HealthHandle>.UnregisterEvent(EventKey.UPDATE_SLIDER_HEALTH_DISPLAY, UpdateSlider);
     }
 
@@ -69,5 +84,9 @@ public class PlayerHealthSlider : GenericSlider<HealthHandle> {
             Vector3 screenPosition = mainCamera.WorldToScreenPoint(playerTransform.position + offset);
             healthBarGameObject.transform.position = screenPosition;
         }
+    }
+
+    void OnApplicationQuit() {
+        EventManager<GameObject>.UnregisterEvent(EventKey.PLAYER_INSTANTIATE, PlayerDependency);
     }
 }

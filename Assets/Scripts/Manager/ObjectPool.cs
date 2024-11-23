@@ -41,6 +41,15 @@ public class ObjectPool : MonoBehaviour
         obj.SetActive(false);
         poolQueue.Enqueue(obj);
     }
+    public void ReturnAllObjects()
+{
+    foreach (var obj in poolQueue)
+    {
+        ReturnObject(obj);
+    }
+    poolQueue.Clear(); // Clear the list of active objects
+}
+
 
     public List<GameObject> GetWave(int waveSize)
     {
